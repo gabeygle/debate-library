@@ -1,0 +1,43 @@
+# ------------------------------------------------------------------
+# THE CORPUS NEVER GOES IN THIS REPOSITORY.
+# Debate evidence files are large, are not ours to redistribute, and
+# contain student names. Only the tooling is tracked.
+# ------------------------------------------------------------------
+*.cmir
+*.docx
+*.doc
+*.docm
+*.dotx
+*.pptx
+*.xlsx
+*.xlsm
+*.xltm
+*.pdf
+
+# Built artifacts -- regenerate with the pipeline
+library.db
+*.db
+*.sqlite
+vectors.npz
+*.npz
+index.html
+!src/template.html
+
+# Reports produced against a real corpus
+QUERY_EVAL*.txt
+QUERY_COMPARE*.txt
+*_REPORT.txt
+_ORIGINAL_LOCATIONS.txt
+STUDENT_NAMES_REVIEW.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+~$*

@@ -1,0 +1,36 @@
+# Real queries collected from students.
+# Used by src/eval_ranking.py to measure whether sloppy input finds the right file.
+
+Please help me find evidence for the states cp
+states cp cards
+50 state fiat
+concon answer
+AT concon
+AT 50 state fiat
+process counterplan how to answer
+defederalization counterplan
+inducements counterplan
+reverse federalism counterplan
+uncooperative federalism counterplan
+i need answer to devolution counterplan
+at fism
+i need a 2ac to answer process counterplans
+2ac at states
+at liberal ontology K
+2ac case cards
+single payer neg
+1nr single payer speech
+give me a speech
+2nr summary states cp
+racism k
+at k
+tropicality
+topicality
+topicality should
+topicality at should
+topicality AT: Should
+1NC--AT: Topicality
+T--USFG speech
+answer to k aff
+help me answer k aff
+k aff answers

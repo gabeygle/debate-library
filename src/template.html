@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debate Library</title>
+<style>
+  :root{
+    --bg:#fbfaf8; --panel:#fff; --ink:#1a1a1a; --muted:#6b6b6b; --line:#e5e2dc;
+    --accent:#8a4b2a; --accent-soft:#f2e9e2; --hl:#fde68a; --ev:#2d6a4f; --an:#7c5c9e;
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#16150f;--panel:#1f1e18;--ink:#eceae4;--muted:#a09b90;--line:#33312a;
+          --accent:#e0a878;--accent-soft:#2c2620;--hl:#7a5c12;--ev:#6fbf95;--an:#b39ddb;
+          --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);
+         border-bottom:1px solid var(--line);padding:14px 22px 0}
+  .brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  h1{font-size:19px;margin:0;letter-spacing:-.01em}
+  .stats{font-size:12.5px;color:var(--muted)}
+  .searchwrap{position:relative;margin-bottom:10px}
+  #q{width:100%;padding:13px 44px 13px 40px;font-size:16px;border:1px solid var(--line);
+     border-radius:10px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);outline:none}
+  #q:focus{border-color:var(--accent)}
+  .sicon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+  #clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;
+         color:var(--muted);cursor:pointer;font-size:17px;display:none;padding:4px}
+  .modes{display:flex;gap:6px;align-items:center;padding-bottom:10px;flex-wrap:wrap}
+  .mode{font-size:12.5px;padding:5px 13px;border:1px solid var(--line);border-radius:8px;
+        background:var(--panel);color:var(--muted);cursor:pointer;font-family:inherit}
+  .mode:hover{border-color:var(--accent);color:var(--ink)}
+  .mode.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .answer{background:var(--accent-soft);border:1px solid var(--line);border-left:3px solid var(--accent);
+          border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:14.5px;line-height:1.6}
+  .answer h4{margin:0 0 7px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .answer .lead{font-weight:600}
+  .answer ul{margin:9px 0 0;padding-left:19px}
+  .answer li{margin:3px 0}
+  .why{font-size:12px;color:var(--muted);margin-top:4px;font-style:italic}
+  .facets{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:12px;align-items:center}
+  .chip{font-size:12.5px;padding:4px 11px;border:1px solid var(--line);border-radius:999px;
+        background:var(--panel);color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+  .chip:hover{border-color:var(--accent);color:var(--ink)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .sep{width:1px;height:18px;background:var(--line);margin:0 4px}
+  main{max-width:1000px;margin:0 auto;padding:18px 22px 80px}
+  .meta{font-size:12.5px;color:var(--muted);margin-bottom:14px;display:flex;
+        justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .didyou{background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;
+          padding:11px 14px;margin-bottom:14px;font-size:14px}
+  .didyou b{cursor:pointer;color:var(--accent);border-bottom:1px dashed var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        padding:14px 16px;margin-bottom:9px;box-shadow:var(--shadow);cursor:pointer;
+        transition:border-color .12s}
+  .card:hover{border-color:var(--accent)}
+  .tag{font-weight:600;margin-bottom:5px;line-height:1.42}
+  .tag.weak{font-weight:400;color:var(--muted);font-style:italic}
+  .cite{font-size:13px;color:var(--muted);margin-bottom:7px;line-height:1.45}
+  .foot{display:flex;gap:7px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted)}
+  .badge{padding:2px 8px;border-radius:5px;border:1px solid var(--line);white-space:nowrap}
+  .badge.ev{color:var(--ev);border-color:currentColor}
+  .badge.an{color:var(--an);border-color:currentColor}
+  .fname{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+         color:var(--muted);word-break:break-all}
+  mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
+  .body{font-size:13.5px;color:var(--muted);margin-top:7px;line-height:1.5;
+        display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .empty{text-align:center;color:var(--muted);padding:64px 20px}
+  .loading{text-align:center;padding:80px 20px;color:var(--muted)}
+  .bar{width:200px;height:3px;background:var(--line);border-radius:2px;margin:14px auto;overflow:hidden}
+  .bar i{display:block;height:100%;width:40%;background:var(--accent);
+         animation:sl 1.1s ease-in-out infinite}
+  @keyframes sl{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+  #more{display:block;margin:20px auto;padding:9px 20px;border:1px solid var(--line);
+        background:var(--panel);color:var(--ink);border-radius:8px;cursor:pointer;font-size:14px}
+  #more:hover{border-color:var(--accent)}
+  dialog{border:0;border-radius:12px;padding:0;max-width:780px;width:92vw;
+         background:var(--panel);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  dialog::backdrop{background:rgba(0,0,0,.45)}
+  .dlg-h{padding:18px 22px 12px;border-bottom:1px solid var(--line)}
+  .dlg-b{padding:16px 22px;max-height:58vh;overflow:auto;font-size:14px;line-height:1.6}
+  .dlg-f{padding:12px 22px;border-top:1px solid var(--line);display:flex;
+         gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+  .btn{padding:8px 15px;border-radius:8px;border:1px solid var(--line);
+       background:var(--panel);color:var(--ink);cursor:pointer;font-size:13.5px;text-decoration:none}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  kbd{font:11px ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);
+      border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Debate Library</h1>
+    <span class="stats" id="stats">loading…</span>
+  </div>
+  <div class="searchwrap">
+    <svg class="sicon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/>
+      <path d="M21 21l-4.3-4.3"/></svg>
+    <input id="q" placeholder="Search 33,000 cards — try deleuze, cyber attacks, arctic sovereignty…"
+           autocomplete="off" spellcheck="false" disabled>
+    <button id="clear" title="Clear">&times;</button>
+  </div>
+  <div class="modes" id="modes">
+    <button class="mode on" data-m="smart">Smart</button>
+    <button class="mode" data-m="exact">Exact words</button>
+    <button class="mode" data-m="title">Title only</button>
+    <span class="sep"></span>
+    <button class="mode" id="answerToggle" title="Show a plain-language summary above the results">Explain</button>
+  </div>
+  <div class="facets" id="facets"></div>
+</header>
+
+<main>
+  <div class="loading" id="loading">
+    Decompressing index…
+    <div class="bar"><i></i></div>
+  </div>
+  <div id="app" hidden>
+    <div class="meta">
+      <span id="count"></span>
+      <span><kbd>/</kbd> search &nbsp; <kbd>Esc</kbd> clear</span>
+    </div>
+    <div id="dym"></div>
+    <div id="answer"></div>
+    <div id="results"></div>
+    <button id="more" hidden>Show more</button>
+  </div>
+</main>
+
+<dialog id="dlg">
+  <div class="dlg-h">
+    <div class="tag" id="d-tag"></div>
+    <div class="cite" id="d-cite"></div>
+  </div>
+  <div class="dlg-b" id="d-body"></div>
+  <div class="dlg-f">
+    <span class="fname" id="d-file"></span>
+    <a class="btn pri" id="d-open" href="#">Open source document</a>
+    <button class="btn" onclick="dlg.close()">Close</button>
+  </div>
+</dialog>
+
+<script id="payload" type="application/octet-stream">__DATA__</script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+let DB = null, VIEW = [], SHOWN = 0, PAGE = 60;
+const F = { format:null, position:null, argtype:null, year:null, collection:null, evOnly:false };
+
+/* ---------- load: base64 -> gzip -> JSON ---------- */
+async function boot(){
+  const b64 = document.getElementById('payload').textContent.trim();
+  const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  let json;
+  if ('DecompressionStream' in window){
+    const ds = new DecompressionStream('gzip');
+    const stream = new Blob([bin]).stream().pipeThrough(ds);
+    json = await new Response(stream).text();
+  } else {
+    json = new TextDecoder().decode(bin);       // fallback: uncompressed payload
+  }
+  DB = JSON.parse(json);
+  DB.terms = new Map(Object.entries(DB.terms));
+  initVectors();
+  // posting lists are delta-encoded; expand once, lazily cached
+  DB._cache = new Map();
+  $('#loading').hidden = true;
+  $('#app').hidden = false;
+  $('#q').disabled = false;
+  $('#q').focus();
+  $('#stats').textContent =
+    `${DB.cards.length.toLocaleString()} cards · ${DB.files.length.toLocaleString()} documents · `
+    + `${DB.meta.evidence.toLocaleString()} with citations`;
+  buildFacets();
+  run('');
+}
+
+/* ---------- semantic layer ----------
+   Vectors were trained on this corpus (TF-IDF -> SVD). Embedding a query is a
+   lookup in the term table plus an average -- no model, no network, which is
+   what lets this work offline during a tournament. */
+let VEC = null;
+function b64ToI8(b64){
+  const bin = atob(b64), out = new Int8Array(bin.length);
+  for (let i=0;i<bin.length;i++){ const v = bin.charCodeAt(i); out[i] = v>127 ? v-256 : v; }
+  return out;
+}
+function initVectors(){
+  if (!DB.vec) return;
+  const v = DB.vec;
+  VEC = { dims:v.dims, T:b64ToI8(v.T), D:b64ToI8(v.D), ti:new Map() };
+  v.terms.forEach((t,i) => VEC.ti.set(t, i));
+  VEC.nCards = VEC.D.length / v.dims;
+}
+function queryVector(terms){
+  if (!VEC) return null;
+  const d = VEC.dims, acc = new Float32Array(d);
+  let n = 0;
+  for (const t of terms){
+    let i = VEC.ti.get(t);
+    if (i === undefined){                    // try a prefix match for typos
+      for (const [k,idx] of VEC.ti){ if (k.length>3 && k.startsWith(t)){ i=idx; break; } }
+    }
+    if (i === undefined) continue;
+    const off = i*d;
+    for (let j=0;j<d;j++) acc[j] += VEC.T[off+j];
+    n++;
+  }
+  if (!n) return null;
+  let mag = 0;
+  for (let j=0;j<d;j++) mag += acc[j]*acc[j];
+  mag = Math.sqrt(mag);
+  if (!mag) return null;
+  for (let j=0;j<d;j++) acc[j] /= mag;
+  return acc;
+}
+function semanticScores(qv, limit){
+  // Cosine against every card. 33k x 64 int8 dot products is ~2M multiply-adds,
+  // which runs in a few milliseconds -- no index structure needed at this size.
+  const d = VEC.dims, N = VEC.nCards, D = VEC.D;
+  const out = new Float32Array(N);
+  for (let c=0;c<N;c++){
+    let s = 0, off = c*d;
+    for (let j=0;j<d;j++) s += D[off+j]*qv[j];
+    out[c] = s;
+  }
+  return out;
+}
+
+function postings(term){
+  if (DB._cache.has(term)) return DB._cache.get(term);
+  const raw = DB.terms.get(term);
+  if (!raw) return null;
+  const out = new Array(raw.length);
+  let acc = 0;
+  for (let i=0;i<raw.length;i++){ acc += raw[i]; out[i] = acc; }
+  DB._cache.set(term, out);
+  return out;
+}
+
+/* ---------- fuzzy: bounded edit distance over the vocabulary ---------- */
+function editWithin(a, b, max){
+  const la=a.length, lb=b.length;
+  if (Math.abs(la-lb) > max) return false;
+  let prev = new Array(lb+1), cur = new Array(lb+1);
+  for (let j=0;j<=lb;j++) prev[j]=j;
+  for (let i=1;i<=la;i++){
+    cur[0]=i; let best=i;
+    for (let j=1;j<=lb;j++){
+      const c = a[i-1]===b[j-1] ? 0 : 1;
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+c);
+      if (cur[j]<best) best=cur[j];
+    }
+    if (best>max) return false;
+    const t=prev; prev=cur; cur=t;
+  }
+  return prev[lb] <= max;
+}
+
+function suggest(term){
+  const max = term.length<=4 ? 1 : 2;
+  let best=null, bestScore=1e9;
+  for (const [t, arr] of DB.terms){
+    if (Math.abs(t.length-term.length) > max) continue;
+    if (t[0] !== term[0] && t[1] !== term[1]) continue;   // cheap prefilter
+    if (!editWithin(term, t, max)) continue;
+    const score = arr.length ? -arr.length : 0;           // prefer common terms
+    if (score < bestScore){ bestScore = score; best = t; }
+  }
+  return best;
+}
+
+/* ---------- search ---------- */
+function tokenize(s){ return (s.toLowerCase().match(/[a-z][a-z'\-]{1,}/g) || []); }
+
+function search(query){
+  const terms = tokenize(query);
+  if (!terms.length) return { hits: null, missing: [] };
+  let acc = null; const missing = [];
+  for (const t of terms){
+    let list = postings(t);
+    if (!list){                                   // prefix expansion
+      const merged = new Set();
+      let n = 0;
+      for (const [k, arr] of DB.terms){
+        if (k.startsWith(t)){
+          for (const id of postings(k)) merged.add(id);
+          if (++n > 40) break;
+        }
+      }
+      list = merged.size ? [...merged] : null;
+    }
+    if (!list){ missing.push(t); continue; }
+    const set = new Set(list);
+    acc = acc === null ? set : new Set([...acc].filter(x => set.has(x)));
+  }
+  return { hits: acc, missing };
+}
+
+function passFacet(c){
+  const f = DB.files[c[2]];
+  if (F.evOnly && !c[4]) return false;
+  if (F.format     && f[2] !== F.format)     return false;
+  if (F.position   && f[3] !== F.position)   return false;
+  if (F.argtype    && f[4] !== F.argtype)    return false;
+  if (F.year       && f[5] !== F.year)       return false;
+  if (F.collection && f[6] !== F.collection) return false;
+  return true;
+}
+
+function run(query){
+  const qterms = tokenize(query);
+  let list = [], missing = [], usedSemantic = false;
+
+  if (!qterms.length){
+    for (let i=0;i<DB.cards.length;i++) if (passFacet(DB.cards[i])) list.push([i,0]);
+    render(list, query, [], false);
+    return;
+  }
+
+  // ---- title-only mode -------------------------------------------------
+  if (MODE === 'title'){
+    for (let i=0;i<DB.cards.length;i++){
+      const c = DB.cards[i];
+      if (!passFacet(c)) continue;
+      const stem = (DB.files[c[2]][0]||'').toLowerCase();
+      let s = 0, all = true;
+      for (const t of qterms){
+        if (stem.includes(t)) s += 10; else all = false;
+      }
+      if (all && s>0) list.push([i, s + (c[4]?1:0)]);
+    }
+    // collapse to one row per document -- a title match is about the file
+    const seen = new Set(), uniq = [];
+    list.sort((a,b)=>b[1]-a[1]);
+    for (const [i,s] of list){
+      const f = DB.cards[i][2];
+      if (seen.has(f)) continue;
+      seen.add(f); uniq.push([i,s]);
+    }
+    render(uniq, query, qterms, false);
+    return;
+  }
+
+  const r = search(query);
+  missing = r.missing;
+  const hits = r.hits;
+
+  // ---- lexical scoring -------------------------------------------------
+  const lex = new Map();
+  if (hits !== null){
+    for (const i of hits){
+      const c = DB.cards[i];
+      if (!passFacet(c)) continue;
+      const tag=(c[0]||'').toLowerCase(), cite=(c[1]||'').toLowerCase();
+      const stem=(DB.files[c[2]][0]||'').toLowerCase();
+      let s = 1;
+      for (const t of qterms){
+        if (stem.includes(t)) s += 8;      // title hits are strong intent
+        if (tag.includes(t))  s += 10;
+        if (cite.includes(t)) s += 4;
+      }
+      if (c[4]) s += 2;
+      if (c[0] && c[0].length > 12) s += 1;
+      lex.set(i, s);
+    }
+  }
+
+  if (MODE === 'exact'){
+    list = [...lex.entries()].sort((a,b)=>b[1]-a[1]);
+    render(list, query, qterms, false);
+    return;
+  }
+
+  // ---- smart mode: blend lexical with semantic -------------------------
+  const qv = queryVector(qterms);
+  if (qv){
+    usedSemantic = true;
+    const sem = semanticScores(qv);
+    // Normalise lexical into 0..1 so the blend is stable regardless of how
+    // many query terms matched.
+    let maxLex = 0;
+    for (const v of lex.values()) if (v>maxLex) maxLex = v;
+    const cand = new Map();
+    for (const [i,v] of lex) cand.set(i, 0.6*(v/(maxLex||1)));
+    // Pull in strong semantic matches the lexical pass never saw -- this is
+    // what rescues "robots taking jobs" when the file says "automation".
+    const idx = Array.from(sem.keys ? sem.keys() : []);
+    let top = [];
+    for (let c=0;c<sem.length;c++) top.push(c);
+    top.sort((a,b)=>sem[b]-sem[a]);
+    const CAP = 400;
+    for (let k=0;k<Math.min(CAP, top.length);k++){
+      const i = top[k];
+      if (!passFacet(DB.cards[i])) continue;
+      const norm = sem[i]/(sem[top[0]]||1);
+      cand.set(i, (cand.get(i)||0) + 0.4*norm);
+    }
+    list = [...cand.entries()].sort((a,b)=>b[1]-a[1]);
+  } else {
+    list = [...lex.entries()].sort((a,b)=>b[1]-a[1]);
+  }
+  render(list, query, qterms, usedSemantic, missing);
+}
+
+function render(list, query, qterms, usedSemantic, missing){
+  missing = missing || [];
+
+  VIEW = list; SHOWN = 0;
+  $('#results').innerHTML = '';
+  $('#count').textContent = !qterms.length
+    ? `${list.length.toLocaleString()} cards`
+    : `${list.length.toLocaleString()} match${list.length===1?'':'es'}`
+      + (usedSemantic ? ' · meaning-based' : '') + (MODE==='title' ? ' · titles' : '');
+
+  buildAnswer(list, query, qterms, usedSemantic);
+
+  const dym = $('#dym'); dym.innerHTML = '';
+  if (missing.length && list.length === 0){
+    const alt = suggest(missing[0]);
+    if (alt){
+      dym.innerHTML = `No results for <b style="cursor:default;border:0">${esc(missing[0])}</b>. `
+                    + `Did you mean <b id="dymgo">${esc(alt)}</b>?`;
+      $('#dymgo').onclick = () => { $('#q').value = query.replace(new RegExp(missing[0],'i'), alt); run($('#q').value); };
+    } else {
+      dym.innerHTML = `No results for <b style="cursor:default;border:0">${esc(missing[0])}</b>.`;
+    }
+  }
+  more();
+}
+
+function esc(s){ return (s||'').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+/* ---------- the "Explain" panel ----------
+   Deliberately NOT generated prose. It reports what the index actually found:
+   which documents dominate the results and why they matched. No model is
+   involved, so it cannot invent a card that does not exist -- which matters
+   when a student may cite whatever they are shown. */
+function buildAnswer(list, query, qterms, usedSemantic){
+  const box = $('#answer');
+  if (!SHOW_ANSWER || !qterms.length || !list.length){ box.innerHTML=''; return; }
+  const byFile = new Map();
+  for (let k=0;k<Math.min(120, list.length);k++){
+    const [i,score] = list[k];
+    const f = DB.cards[i][2];
+    if (!byFile.has(f)) byFile.set(f, {n:0, best:i, score:0});
+    const e = byFile.get(f);
+    e.n++; e.score += score;
+    if (score > list[0][1]*0) e.best = e.best;
+  }
+  const ranked = [...byFile.entries()].sort((a,b)=>b[1].score-a[1].score).slice(0,4);
+  const top = ranked[0];
+  if (!top) { box.innerHTML=''; return; }
+  const f0 = DB.files[top[0]];
+  const matched = qterms.filter(t =>
+    (DB.cards[top[1].best][0]||'').toLowerCase().includes(t) ||
+    (DB.cards[top[1].best][6]||'').toLowerCase().includes(t));
+
+  let html = `<h4>What I found</h4>`;
+  html += `<div class="lead">${esc(f0[0])}</div>`;
+  html += `<div class="why">${top[1].n} matching card${top[1].n===1?'':'s'} in this document`
+        + (matched.length ? ` · matched on ${matched.map(esc).join(', ')}`
+                          : usedSemantic ? ` · matched on meaning, not exact words` : '')
+        + `</div>`;
+  if (ranked.length > 1){
+    html += `<ul>`;
+    for (const [fi,e] of ranked.slice(1)){
+      html += `<li>${esc(DB.files[fi][0])} <span class="why">— ${e.n} card${e.n===1?'':'s'}</span></li>`;
+    }
+    html += `</ul>`;
+  }
+  html += `<div class="why" style="margin-top:9px">Always open the source document and read the`
+        + ` full card before you cite it.</div>`;
+  box.innerHTML = html;
+}
+
+function hl(text, terms){
+  let out = esc(text);
+  for (const t of terms){
+    if (t.length < 2) continue;
+    out = out.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'), '<mark>$1</mark>');
+  }
+  return out;
+}
+
+function more(){
+  const terms = tokenize($('#q').value);
+  const frag = document.createDocumentFragment();
+  const end = Math.min(SHOWN + PAGE, VIEW.length);
+  for (let k=SHOWN;k<end;k++){
+    const idx = VIEW[k][0], c = DB.cards[idx], f = DB.files[c[2]];
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.onclick = () => openCard(idx);
+    const weak = !c[0] || c[0].length < 12;
+    const title = c[0] || (c[6] ? c[6].slice(0,140)+'…' : '(untagged card)');
+    const bits = [];
+    if (c[4]) bits.push('<span class="badge ev">evidence</span>');
+    else      bits.push('<span class="badge an">analytic</span>');
+    if (f[4]) bits.push(`<span class="badge">${esc(f[4])}</span>`);
+    if (f[3]) bits.push(`<span class="badge">${esc(f[3])}</span>`);
+    if (f[7]) bits.push(`<span class="badge">${esc(f[7])}</span>`);
+    if (f[5]) bits.push(`<span class="badge">${esc(f[5])}</span>`);
+    if (c[3]) bits.push(`<span class="badge">${esc(c[3].slice(0,46))}</span>`);
+    el.innerHTML =
+      `<div class="tag${weak?' weak':''}">${hl(title, terms)}</div>` +
+      (c[1] ? `<div class="cite">${hl(c[1].slice(0,190), terms)}</div>` : '') +
+      (c[6] ? `<div class="body">${hl(c[6], terms)}</div>` : '') +
+      `<div class="foot">${bits.join('')}<span class="fname">${esc(f[0])}</span></div>`;
+    frag.appendChild(el);
+  }
+  $('#results').appendChild(frag);
+  SHOWN = end;
+  $('#more').hidden = SHOWN >= VIEW.length;
+  $('#more').textContent = `Show more (${(VIEW.length-SHOWN).toLocaleString()} left)`;
+}
+
+function openCard(i){
+  const c = DB.cards[i], f = DB.files[c[2]];
+  $('#d-tag').textContent  = c[0] || '(untagged card)';
+  $('#d-cite').textContent = c[1] || '';
+  $('#d-body').textContent = c[6] || '(no body text stored — open the source document for the full card)';
+  $('#d-file').textContent = f[0];
+  $('#d-open').href = '../' + encodeURIComponent(f[1] || (f[0] + '.docx'));
+  $('#dlg').showModal();
+}
+
+/* ---------- facets ---------- */
+function buildFacets(){
+  const box = $('#facets');
+  const mk = (label, key, val) => {
+    const b = document.createElement('span');
+    b.className = 'chip'; b.textContent = label;
+    b.onclick = () => {
+      if (key === 'evOnly') F.evOnly = !F.evOnly;
+      else F[key] = (F[key] === val) ? null : val;
+      [...box.children].forEach(ch => {
+        if (ch.dataset.k === 'evOnly') ch.classList.toggle('on', F.evOnly);
+        else if (ch.dataset.k) ch.classList.toggle('on', F[ch.dataset.k] === ch.dataset.v);
+      });
+      run($('#q').value);
+    };
+    b.dataset.k = key; if (val != null) b.dataset.v = val;
+    return b;
+  };
+  const ev = mk('Evidence only', 'evOnly', null); box.appendChild(ev);
+  const addGroup = (vals, key) => {
+    if (!vals.length) return;
+    const s = document.createElement('span'); s.className='sep'; box.appendChild(s);
+    vals.forEach(v => box.appendChild(mk(v, key, v)));
+  };
+  addGroup(DB.meta.formats,     'format');
+  addGroup(DB.meta.argtypes,    'argtype');
+  addGroup(DB.meta.positions,   'position');
+  addGroup(DB.meta.years,       'year');
+  addGroup(DB.meta.collections, 'collection');
+}
+
+/* ---------- events ---------- */
+let MODE = 'smart', SHOW_ANSWER = false;
+document.querySelectorAll('#modes .mode[data-m]').forEach(b => {
+  b.onclick = () => {
+    MODE = b.dataset.m;
+    document.querySelectorAll('#modes .mode[data-m]').forEach(x =>
+      x.classList.toggle('on', x === b));
+    run($('#q').value);
+  };
+});
+$('#answerToggle').onclick = () => {
+  SHOW_ANSWER = !SHOW_ANSWER;
+  $('#answerToggle').classList.toggle('on', SHOW_ANSWER);
+  run($('#q').value);
+};
+
+let timer = null;
+$('#q').addEventListener('input', e => {
+  $('#clear').style.display = e.target.value ? 'block' : 'none';
+  clearTimeout(timer);
+  timer = setTimeout(() => run(e.target.value), 110);
+});
+$('#clear').onclick = () => { $('#q').value=''; $('#clear').style.display='none'; run(''); $('#q').focus(); };
+$('#more').onclick = more;
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== $('#q')){ e.preventDefault(); $('#q').focus(); }
+  if (e.key === 'Escape' && document.activeElement === $('#q')){ $('#q').value=''; run(''); }
+});
+const dlg = $('#dlg');
+boot().catch(err => {
+  $('#loading').innerHTML = 'Failed to load index:<br><code>' + esc(String(err)) + '</code>';
+});
+</script>
+</body>
+</html>
