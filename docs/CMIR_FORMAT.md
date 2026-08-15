@@ -1,5 +1,11 @@
 # Analysing debate files in CardMirror `.cmir` format
 
+> Originally published at
+> [burdenofproof.education](https://burdenofproof.education/audience-adaptation.html),
+> where the two sample files and three working scripts referenced below are
+> also available. Reproduced here because this repository's parsing code is
+> built directly on it.
+
 A handoff brief. Everything below was learned by taking apart two real policy debate files and
 checking the results against a human hand count. Written 11 August 2026.
 
