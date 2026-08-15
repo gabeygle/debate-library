@@ -1,0 +1,74 @@
+{
+  "_comment": [
+    "Maps YOUR folder names onto library facets. Copy this to folder_map.json",
+    "and edit it -- fix_facets.py loads that file if present, otherwise falls",
+    "back to the generic defaults below.",
+    "",
+    "Only 'division' is likely to need editing: those are the top-level folders",
+    "of your own tree, which nobody else shares. The other three are ordinary",
+    "debate conventions and usually work as-is.",
+    "",
+    "Facets are derived from the folder a file sat in BEFORE flattening, read",
+    "from the manifest that flatten_backfile.py writes. That is how the old",
+    "hierarchy survives as searchable metadata instead of being lost."
+  ],
+
+  "division": {
+    "_comment": "top-level folder -> which debate format it belongs to",
+    "Policy_Debate": "Policy",
+    "Public_Forum": "Public Forum",
+    "Smart_Debate": "Smart Debate",
+    "Lincoln_Douglas": "Lincoln-Douglas",
+    "Classroom_Materials": "Policy"
+  },
+
+  "position": {
+    "_comment": "folder -> speech position",
+    "1AC": "1AC", "2AC": "2AC", "1NC": "1NC", "2NC": "2NC",
+    "1AR": "1AR", "2AR": "2AR", "1NR": "1NR", "2NR": "2NR"
+  },
+
+  "argtype": {
+    "_comment": "folder -> argument type",
+    "DAs": "Disadvantage",
+    "Disads": "Disadvantage",
+    "CPs": "Counterplan",
+    "Counterplans": "Counterplan",
+    "Kritiks": "Kritik",
+    "K Answer Backfiles": "Kritik",
+    "T_Blocks": "Topicality",
+    "Topicality": "Topicality",
+    "AFF_Blocks": "Aff",
+    "Neg_Blocks": "Neg",
+    "Drill_Docs": "Drill",
+    "Drills": "Drill",
+    "Impacts": "Impacts",
+    "Cards_Backfiles": "Cards",
+    "Round_Flows": "Round",
+    "Speeches": "Round",
+    "Lessons": "Teaching",
+    "Lectures": "Teaching",
+    "Scripts": "Teaching",
+    "Gamification": "Teaching",
+    "Novice Files": "Teaching",
+    "Templates": "Template"
+  },
+
+  "stop_topic": {
+    "_comment": [
+      "Folder names that describe FILING rather than subject matter, so they",
+      "are never treated as a topic. Without this you get topics called 'Dump'",
+      "and 'Misc', which read as noise.",
+      "",
+      "A real topic is the folder directly under a 'Topics' folder --",
+      "Policy_Debate/Topics/Arctic_2025-26 gives topic 'Arctic', year '2025-26'.",
+      "Everywhere else no topic is claimed, because guessing one is worse than",
+      "leaving the facet empty."
+    ],
+    "values": [
+      "Topics", "Misc", "Generic", "Undated", "Unknown", "Condo", "WIP",
+      "Dump", "Lit", "CX", "PF", "Media", "Resources", "Backfiles",
+      "Toolbox", "Tools", "user_approval", "duplicates", "scripts"
+    ]
+  }
+}

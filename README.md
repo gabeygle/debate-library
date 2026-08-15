@@ -1,7 +1,7 @@
 # Debate Library
 
 A card-level search engine for competitive debate evidence files, built over
-[CardMirror](https://github.com/ant981228/cardmirror) `.cmir` documents.
+[CardMirror](https://github.com/ant981228/cardmirror) `.cmir` documents. Built with Claude and inspired by [Logos] (https://logos-debate.netlify.app/).
 
 Debate evidence lives in enormous Word files — a single backfile can run to
 900,000 words — organised into *cards*: a tagline, a citation, and a quoted
@@ -64,6 +64,20 @@ Open the resulting `index.html`.
 | `eval_ranking.py` | Score ranking configurations against marked queries |
 | `restyle_cards.py` | Recover cards from `.docx` files with broken tag styles |
 | `flatten_backfile.py` | Flatten and dedupe a nested backfile tree |
+
+### Configuring folder mappings
+
+`fix_facets.py` turns the folder a file used to live in into searchable
+metadata. Your top-level folder names are your own, so they live in config
+rather than code:
+
+```bash
+cp src/folder_map.example.json src/folder_map.json
+# edit the "division" block to match your top-level folders
+```
+
+Without it the generic defaults still work; you will just get lower coverage on
+the division facet. `folder_map.json` is gitignored.
 
 ## Documentation
 

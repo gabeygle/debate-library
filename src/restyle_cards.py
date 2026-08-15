@@ -3,16 +3,16 @@
 Recover card structure in .docx files whose taglines lost their Word styles.
 
 The problem: CardMirror (like Verbatim) identifies a card by paragraph style.
-Heading 4 marks the tag; a cite style marks the citation. Two files in this
-corpus kept their section headings but lost the tag styling, so every card
-collapsed into unstyled body text and the converter found zero cards:
+Heading 4 marks the tag; a cite style marks the citation. Some files keep their
+section headings but lose the tag styling, so every card collapses into
+unstyled body text and the converter reports zero cards. Two real examples:
 
-  Baudrillard.docx        102,147 words, 25,674 underlined, 1 Heading 4
-  Impacts_Dedev_Ian.docx   90,238 words, 18,438 underlined, nonstandard styles
-                                          ("card", "evidencetext", "cardtext")
+  file A   102,147 words, 25,674 underlined, exactly 1 Heading 4
+  file B    90,238 words, 18,438 underlined, nonstandard style names
+                                    ("card", "evidencetext", "cardtext")
 
 The evidence and the warrant marking are intact in both. Only the labels are
-missing.
+missing. The tell is a large word count with heavy underlining and no cards.
 
 DETECTION -- deliberately conservative. A card is emitted only on the full
 three-part rhythm:
@@ -39,8 +39,9 @@ import shutil
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH  # noqa: F401  (import validates docx)
 
-# "Coulter 11 (Gerry, founding editor...", "Baudrillard 1993 (Transparency...",
-# "Jason Dana et al. 23. Ph.D., ..." -- an author token followed by a year.
+# Matches the citation conventions debaters actually use:
+#   "Smith 11 (John, founding editor of...", "Author 1993 (Title, pages 39-40)",
+#   "Jane Doe et al. 23. Ph.D., ..." -- an author token followed by a year.
 CITE_RE = re.compile(
     r"^[^a-z]{0,4}[A-Z][A-Za-z.\-']+(?:\s+(?:et\s+al\.?|and|&|[A-Z][A-Za-z.\-']+)){0,3}"
     r"[\s,]*(?:'|’)?\d{2,4}\b"

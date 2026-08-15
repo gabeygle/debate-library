@@ -41,3 +41,7 @@ venv/
 .DS_Store
 Thumbs.db
 ~$*
+
+# user-specific folder mappings (copy from folder_map.example.json)
+src/folder_map.json
+folder_map.json

@@ -20,6 +20,7 @@ Usage: python3 fix_facets.py [--db library.db] [--manifest ...]
 
 import argparse
 import collections
+import json
 import os
 import re
 import sqlite3
@@ -54,49 +55,76 @@ FORMAT_PAT = [
     (re.compile(SEP + r"(?:CX|NCX|VCX|JVCX|Policy)" + END, re.I),  "Policy"),
 ]
 
-# Division names as they appeared at the top of the original tree.
-DIVISION = {
-    "Policy_Debate": "Policy",
-    "Public_Forum": "Public Forum",
-    "Smart_Debate": "Smart Debate",
-    "Classroom_Materials": "Policy",
-    "ADL Gabe": "Policy",
-}
 
 YEAR_IN_PATH = re.compile(r"(20\d{2})[-–_](\d{2})|(20\d{2})|['’](\d{2})[-–]['’](\d{2})")
 
-# Only 122 of 1,296 files sat under a Topics/ folder. The rest of the tree
-# encoded speech position and argument type instead, so those folders are
-# mapped to the facet they actually describe rather than being forced into a
-# "topic" label that would read as noise ("Dump", "DAs", "2AC").
-FOLDER_POSITION = {
-    "1AC": "1AC", "2AC": "2AC", "1NC": "1NC", "2NC": "2NC",
-    "1AR": "1AR", "2AR": "2AR", "1NR": "1NR", "2NR": "2NR",
+# Folder-name mappings are configuration, not code: they describe one
+# person's directory tree and nobody else's. Copy folder_map.example.json to
+# folder_map.json and edit it. Defaults below are generic debate conventions.
+#
+# Most folders in a real tree encode speech position or argument type rather
+# than topic -- measured on one corpus, only 122 of 1,296 files sat under a
+# "Topics" folder. So folders are mapped to the facet they actually describe,
+# instead of being forced into a topic label that reads as noise.
+
+DEFAULT_MAP = {
+    "division": {
+        "Policy_Debate": "Policy",
+        "Public_Forum": "Public Forum",
+        "Smart_Debate": "Smart Debate",
+        "Lincoln_Douglas": "Lincoln-Douglas",
+        "Classroom_Materials": "Policy",
+    },
+    "position": {
+        "1AC": "1AC", "2AC": "2AC", "1NC": "1NC", "2NC": "2NC",
+        "1AR": "1AR", "2AR": "2AR", "1NR": "1NR", "2NR": "2NR",
+    },
+    "argtype": {
+        "DAs": "Disadvantage", "Disads": "Disadvantage",
+        "CPs": "Counterplan", "Counterplans": "Counterplan",
+        "Kritiks": "Kritik", "K Answer Backfiles": "Kritik",
+        "T_Blocks": "Topicality", "Topicality": "Topicality",
+        "AFF_Blocks": "Aff", "Neg_Blocks": "Neg",
+        "Drill_Docs": "Drill", "Drills": "Drill",
+        "Impacts": "Impacts", "Cards_Backfiles": "Cards",
+        "Round_Flows": "Round", "Speeches": "Round",
+        "Lessons": "Teaching", "Lectures": "Teaching",
+        "Scripts": "Teaching", "Gamification": "Teaching",
+        "Novice Files": "Teaching", "Templates": "Template",
+    },
+    "stop_topic": [
+        "Topics", "Misc", "Generic", "Undated", "Unknown", "Condo", "WIP",
+        "Dump", "Lit", "CX", "PF", "Media", "Resources", "Backfiles",
+        "Toolbox", "Tools", "user_approval", "duplicates", "scripts",
+    ],
 }
-FOLDER_ARGTYPE = {
-    "DAs": "Disadvantage",
-    "T_Blocks": "Topicality",
-    "AFF_Blocks": "Aff",
-    "Drill_Docs": "Drill",
-    "Drills": "Drill",
-    "K Answer Backfiles": "Kritik",
-    "Impacts": "Impacts",
-    "Cards_Backfiles": "Cards",
-    "Round_Flows": "Round",
-    "Speeches": "Round",
-    "Lessons": "Teaching",
-    "Lectures": "Teaching",
-    "Scripts": "Teaching",
-    "Templates": "Template",
-    "Gamification": "Teaching",
-    "Novice Files": "Teaching",
-}
-# Folder names that describe filing, not subject matter.
-STOP_TOPIC = {
-    "Topics", "Misc", "Generic", "Undated", "Unknown", "Condo", "WIP", "Dump",
-    "Lit", "CX", "PF", "Media", "Resources", "Gabe's Files", "Debate Toolbox",
-    "ADL Tools", "ADL Class DT", "user_approval", "duplicates", "scripts",
-} | set(FOLDER_POSITION) | set(FOLDER_ARGTYPE)
+
+
+def load_folder_map(path=None):
+    """Load folder_map.json if present, else fall back to the defaults."""
+    path = path or os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "folder_map.json")
+    cfg = {k: (dict(v) if isinstance(v, dict) else list(v))
+           for k, v in DEFAULT_MAP.items()}
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as fh:
+            user = json.load(fh)
+        for key in ("division", "position", "argtype"):
+            block = user.get(key) or {}
+            cfg[key].update({k: v for k, v in block.items()
+                             if not k.startswith("_")})
+        st = user.get("stop_topic") or {}
+        vals = st.get("values") if isinstance(st, dict) else st
+        if vals:
+            cfg["stop_topic"] = list(vals)
+    return cfg
+
+
+_MAP = load_folder_map()
+DIVISION = _MAP["division"]
+FOLDER_POSITION = _MAP["position"]
+FOLDER_ARGTYPE = _MAP["argtype"]
+STOP_TOPIC = set(_MAP["stop_topic"]) | set(FOLDER_POSITION) | set(FOLDER_ARGTYPE)
 
 
 def norm_year(m):

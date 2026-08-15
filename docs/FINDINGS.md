@@ -76,17 +76,22 @@ cards while containing intact evidence:
 
 | File | Words | Underlined | Cards |
 |---|---|---|---|
-| God-K-Megafile | 197,722 | 51,355 | 0 |
-| Baudrillard | 102,147 | 25,674 | 0 |
-| Impacts_Dedev_Ian | 90,238 | 18,438 | 0 |
+| A (kritik backfile) | 197,722 | 51,355 | 0 |
+| B (theory backfile) | 102,147 | 25,674 | 0 |
+| C (impacts file) | 90,238 | 18,438 | 0 |
 
 Roughly 390,000 words of marked evidence, invisible to card-level search,
 because tagline paragraphs lost their Heading 4 style. Two were recovered:
 
-- Baudrillard: 0 → **55 cards, 54 evidence**
-- Impacts_Dedev_Ian: 0 → **27 cards, 27 evidence**
+- B: 0 → **55 cards, 54 evidence**
+- C: 0 → **27 cards, 27 evidence**
 
 Three recovered cards were spot-checked verbatim against the source: 3/3 real.
+
+The signal to look for is a large word count with heavy underlining and zero
+cards. Underlining marks the warrant inside quoted evidence, so a file with
+tens of thousands of underlined words and no cards has not lost its evidence —
+it has lost its labels.
 
 **"Empty" files may hold images.** Seven files reported zero words. All seven
 contain one or two embedded images — two are 2.1 MB photographs of attendance
@@ -159,4 +164,4 @@ script does correctly and a model approximates.
 - LSA drifts on abstract queries (`china spying on us`).
 - Six source files were found to be **100% null bytes** — a failed sync or disk
   copy, unrecoverable, predating this tooling.
-- Roughly 197,000 words in God-K-Megafile remain uncarded.
+- Roughly 197,000 words in one kritik backfile remain uncarded.
